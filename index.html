@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Localização</title>
+    <script>
+        // Função para capturar a geolocalização do dispositivo
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                alert("Geolocalização não é suportada por este navegador.");
+            }
+        }
+
+        // Função para enviar a localização ao servidor (servidor Python)
+        function sendLocation(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            // Enviar as coordenadas para o servidor Python
+            fetch('http://seu-servidor.com/capturar_localizacao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Localização capturada e enviada com sucesso!");
+            })
+            .catch((error) => {
+                alert("Erro ao enviar a localização.");
+                console.error('Erro:', error);
+            });
+        }
+
+        // Função para tratar erros da geolocalização
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Usuário negou a solicitação de geolocalização.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informação de localização não disponível.");
+                    break;
+                case error.TIMEOUT:
+                    alert("A solicitação de geolocalização expirou.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Erro desconhecido.");
+                    break;
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Bem-vindo à página de captura de localização</h1>
+    <p>Por favor, clique no link abaixo para capturar sua localização exata:</p>
+    <a href="javascript:void(0);" onclick="getLocation()">Capturar Localização</a>
+
+</body>
+</html>
